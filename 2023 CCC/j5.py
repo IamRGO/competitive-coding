@@ -1,0 +1,169 @@
+# word = input()
+# l = int(input())
+# w = int(input())
+# puzzle = []
+
+# for i in range(l):
+#     puzzle.append(input().split())
+
+# rules = {(1, 1) : ([-1, 1], [1, -1]),
+#          (-1, -1) : ([-1, 1], [1, -1]),
+
+#          (-1, 1) : ([-1, -1], [1, 1]),
+#          (1, -1) : ([-1, -1], [1, 1]),
+
+#          (0, -1) : ([-1, 0], [1, 0]),
+#          (0, 1) : ([-1, 0], [1, 0]),
+
+#          (-1, 0) : ([0, -1], [0, 1]),
+#          (1, 0) : ([0, -1], [0, 1])}
+
+# def bfs(x, y):
+#     count = 0
+#     queue = [(x, y, None, None, [[x, y]])]
+
+#     while len(queue) != 0:
+#         x, y, t_status, cur_dir, hist = queue.pop(0)
+
+#         next_letter = len(hist)
+#         if next_letter == len(word):
+#             count += 1
+#             continue
+
+
+#         next_dir = [cur_dir]
+#         if t_status == None:
+#             next_dir = rules.keys()
+
+#         elif t_status == False:
+#             next_dir += rules[cur_dir]
+
+#         for i in next_dir:
+#             n_y = y + i[0]
+#             n_x = x + i[1]
+
+#             if t_status == None:
+#                 nt_status = False
+#             else:
+#                 nt_status = t_status or cur_dir != i
+
+#             if n_x < 0 or n_y < 0 or n_x >= w or n_y >= l:
+#                 continue
+
+#             if puzzle[n_y][n_x] == word[next_letter]:
+#                 queue.append((n_x, n_y, nt_status, i, hist + [[n_x, n_y]]))
+
+#     return count
+
+# total = 0
+# for i in range(l):
+#     for j in range(w):
+#         if puzzle[i][j] == word[0]:
+#             total += bfs(j, i)
+# print(total)
+
+# """
+# MENU
+# 5
+# 7
+# F T R U B L K
+# P M N A X C U
+# A E R C N E O
+# M N E U A R M
+# M U N E M N S
+
+# NATURE
+# 6
+# 9
+# N A T S F E G Q N
+# S A I B M R H F A
+# C F T J C U C L T
+# K B H U P T A N U
+# D P R R R J D I R
+# I E E K M E G B E
+
+
+# 10:08.68
+# """
+
+
+
+
+
+
+
+word = input()
+y = int(input())
+x = int(input())
+puzzle = []
+for i in range(y):
+    puzzle.append(input().split())
+
+
+moves = {
+    (0, 1) : ((0, 1), (-1, 0), (1, 0)),
+    (0, -1) : ((-1, 0), (1, 0), (0, -1)),
+
+    (-1, 0) : ((0, 1), (0, -1), (-1, 0)),
+    (1, 0) : ((0, -1), (0, 1), (1, 0)),
+
+    (1, 1) : ((1, -1), (-1, 1), (1, 1)),
+    (-1, -1) : ((-1, 1), (1, -1), (-1, -1)),
+
+    (-1, 1) : ((-1, -1), (1, 1), (-1, 1)),
+    (1, -1) : ((-1, -1), (1, 1), (1, -1))
+}
+
+
+found = []
+def search(start):
+    # coord, has turned, current direction, hist
+    queue = [(start, None, None, [start])]
+
+    while len(queue) > 0:
+        pos, has_turned, curr_dir, hist = queue.pop(0)
+
+        next_letter = len(hist)
+        if next_letter == len(word):
+            found.append(hist)
+            continue
+
+        next_moves = []
+
+        if curr_dir != None:
+            next_moves = moves[curr_dir]
+        else:
+            next_moves = list(moves.keys())
+
+        for i in next_moves:
+            # print(pos, "wwdwc", i)
+            y = pos[0] + i[0]
+            x = pos[1] + i[1]
+
+            if has_turned == None:
+                new_turned = False
+
+            elif has_turned == False:
+                new_turned = (i != curr_dir)
+
+            elif has_turned == True:
+                if i != curr_dir:
+                    continue
+                else:
+                    new_turned = True
+
+            if x < 0 or x == len(puzzle[0]) or y < 0 or y == len(puzzle):
+                continue
+
+            if puzzle[y][x] == word[next_letter]:
+                if (y, x) not in hist:
+                    queue.append(((y, x), new_turned, i, hist + [tuple((y, x))]))
+
+
+for i in range(y):
+    for j in range(x):
+        if puzzle[i][j] == word[0]:
+            # print(i, j, "is the pos found")
+            search((i, j))
+
+print(len(found))
